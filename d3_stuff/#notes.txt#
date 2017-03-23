@@ -1,0 +1,32 @@
+// You can select all of a thing with
+
+d3.selectAll("p"); // type
+d3.selectAll(".something"); // classes
+d3.selectAll("#id");
+
+// manipulate individual nodes using
+
+d3.select("thing")
+// manipulate the style using
+    .style("attribute(color, etc)", new_attribute);
+// you can use lambda functions
+func = function(x) {
+    return x*x};
+// binding is an important thing and it's done like this
+d3.selectAll("p")
+    .data([1,2,3,4]) // data method of selection
+// style is another method of selection (note that calling a method returns
+// the original object so you can chain things together nicely
+    .style("font-size", function(d) { return d + "px"});
+// enter and exit
+d3.select("body")
+    .selectAll("p") // you can traverse the tree like this
+    .data([1,2,3]) // bind data
+    .enter().append("p") // for some reason you use these together as one
+// to make sure that you add as many paragraphs as necessary to hold the
+// data
+    .text(function(d) { you git it}); set
+//
+var p = d3.select("body")
+    .selectAll("p") // select all paragrahps in the body
+    .exit().remove() // get rid of nodes that arent bound to data

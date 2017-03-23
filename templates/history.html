@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Transaction History
+{% endblock %}
+
+{% block main %}
+<h2> Transaction History </h2>
+<div class="container-fluid">
+  <div class="row">
+    <table class="table table-hover">
+      <tr>
+	<th class="text-center">Date</th>
+	<th class="text-center">Stock</th>
+	<th class="text-center">Shares</th>
+	<th class="text-center">Price</th>					 
+      </tr>
+      {% for transaction in transactions %}
+      <tr>
+	<td class="text-center">{{ transaction.time.strftime("%a %b %d %Y %X") }}</td>
+	<td class="text-center"><a href="/quote/{{transaction.stock}}">{{ transaction.stock }}</a></td>
+	<td class="text-center">{{ transaction.shares }}</td>
+	<td class="text-center">{{ usd(transaction.price) }}</td>
+      </tr>
+      {% endfor %}	
+    </table>
+  </div>
+</div> 
+{% endblock %}

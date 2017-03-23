@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+<div class="container_fluid">
+  <form action="{{ url_for('quote') }}" method="post">
+    <fieldset>
+      <div class="form-group">
+	{% if stock_info != None %}
+        <input autocomplete="off" autofocus class="form-control" name="stock" value={{ stock_info["symbol"] }} type="text"/>
+	{% else %}
+	<input autocomplete="off" autofocus class="form-control" name="stock" placeholder=Stock type="text"/>
+	{% endif %}
+      </div>
+      <div class="form-group">
+        <button class="btn btn-default" type="submit" name="submit" value="quote" >Get Price</button>
+      </div>
+      {% if stock_info != None %}
+      <p><lead>{{ stock_info["name"] }}</lead><p>
+      <p>Price: <strong>{{ usd(stock_info["price"]) }}</strong></p>
+      <p>Currently, you have <strong>{{ shares }}</strong> shares of this stock</p>
+      <p>Balance remaining: <strong>{{ usd(balance) }}</strong></p>
+
+      <div class="form-group">
+	<input autocomplete="off" autofocus class="form-control" name="shares" placeholder=Shares type="text"/>
+      </div>
+      <div class="form-group">
+	<button class="btn btn-default" type="submit" name="submit" value="buy">Buy</button>
+	<button class="btn btn-default" type="submit" name="submit" value="sell">Sell</button>
+      </div>
+      {% else %}
+      <div hidden class="form-group">
+	<input autocomplete="off" autofocus class="form-control" name="shares" placeholder=Shares type="text"/>
+      </div>
+      {% endif %}
+    </fieldset>
+  </form>
+</div>
+    
+{% endblock %}
