@@ -1,9 +1,13 @@
-var data
+var tree
 var svg
-var links
-var nodes
 var color
 var simulation
+var tree
+
+function clean(treeNode){
+    return treeNode.data;
+}
+    
 
 // SIMULATION FUNCTIONS
 function ticked() {
@@ -41,18 +45,7 @@ $(document).ready( function(result) {
     
     // GET JSON AND UPDATE NODES
     $.getJSON($SCRIPT_ROOT + '/_update_data', function(d) {
-	console.log(d)
-	data = d;
-	temp = [];
-	data.nodes.forEach( function(node) {
-	    node.children.forEach( function(child) {
-		temp.push({"source" : node,
-			   "target" : child});
-		console.log(child);
-	    })
-	})
-	console.log(temp);
-	console.log(data);
+	tree = d3.hierarchy(d);
 
 	// DEFINE SVG PARAMETERS
 	svg = d3.select("svg"),
@@ -70,54 +63,53 @@ $(document).ready( function(result) {
 
 	// DEFINE LINK PARAMENTES
 	links = svg.append("g")
-	    .attr("class", "links")   
+	    .attr("class", "links");   
 
 	// DEFINE NODE PARAMETERS
 	nodes = svg.append("g")
-	    .attr("class", "nodes")
+	    .attr("class", "nodes");
 
-	// DEFINE SIMULATION PARAMETERS
+ 	// DEFINE SIMULATION PARAMETERS
 	simulation = d3.forceSimulation()
 	    .force("link", d3.forceLink()
 		   .id(function(d) { return d.id; })
 		   .distance(100))
 	    .force("charge", d3.forceManyBody())
 	    .force("center", d3.forceCenter(width / 2, height / 2))
-	    .on("tick", ticked);;
-  
-	update_data(data);
+	    .on("tick", ticked);
+	
+	update_data(tree);
     })
 })
 
 // OVERLAY FUNCTIONS
 function open_overlay(c) {
-    console.log('opening overlay')    
+    console.log(c);
     $( '.overlay' )
 	.css( "width", "33%" );
 
     $( '#title' )
 	.off()
-	.val(c.title)
+	.val(c.data.title)
 	.change(function() {
-	    c.title = $(this).val();
+	    c.data.title = $(this).val();
 	    update_data();
 	    send_data();
 	});
     
     $( '#text' )
 	.off()
-	.val(c.text)
+	.val(c.data.text)
 	.on('change',function() {
-	    c.text = $(this).val();
+	    c.data.text = $(this).val();
 	    update_data();
 	    send_data();
 	})
 }
 
 function send_data() {
-    console.log(data)
     $.post($SCRIPT_ROOT + '/_update_data',
-	   JSON.stringify(data),
+	   JSON.stringify(clean(tree)),
 	   function(d, textStatus) {
 	       console.log(textStatus)
 	   },
@@ -126,17 +118,25 @@ function send_data() {
 
 
 function update_data() {
+   
     // UPDATE ---------------------------------
 
+    var nodes = tree.descendants();
+    var links = tree.links();
+    console.log(tree)
+    console.log(tree.links())
     
-    var link = links.selectAll(".link")
-	.data(data.links);
+    var link = svg.select(".links")
+	.selectAll(".link")
+	.data(links);
 
-    var node = nodes.selectAll(".node")
-	.data(data.nodes);
+    var node = svg.select(".nodes")
+	.selectAll(".node")
+	.data(nodes);
 
     // enter does something different
 
+    console.log('starting enter')
     // ENTER --------------------------------
     // nodes
     var nodeEnter = node.enter().append("g")
@@ -164,7 +164,12 @@ function update_data() {
 	.attr('class', 'context_menu')
 	.attr('visibility','hidden')
 	.append('g').attr('class', 'menu-entry')
-	.attr('transform', 'translate(10,-50)');
+	.attr('transform', 'translate(10,-50)')
+	.on("click", function(d) {
+	    d3.event.stopPropagation();
+	    console.log('clicked');
+	    add_node(d);
+	});
     
     context_menus.append('rect')
 	.attr('width', 75)
@@ -179,13 +184,16 @@ function update_data() {
 	    .attr('class', 'link');
 
 
+    console.log('starting update')
     // UPDATE
-    var nodeUPDATE = nodes.selectAll('.node')
+    var nodeUPDATE = svg.select(".nodes")
+	.selectAll('.node')
 	.select('text')
 	.text( function (d) {
-	    return d.title});
+	    return d.data.title});
 
-    var linkUPDATE = links.selectAll('.link')
+    var linkUPDATE = svg.select(".links")
+	.selectAll('.link')
 	.attr("stroke-width",
 	      function(d) {
 		  //return Math.sqrt(d.value);
@@ -193,22 +201,41 @@ function update_data() {
 	      })
 
     // EXIT
-	
+    console.log(nodes)
+    console.log(links)
     node.exit().remove()
     link.exit().remove()
 
-    simulation.nodes(data.nodes);
-
+    console.log('aou')
+    simulation.nodes(nodes);
+    console.log('aoeuaoeu')
     simulation.force("link")
-	.links(data.links);
-
+	.links(links);
+    console.log('aa')
     simulation.restart()
-
-    // EXIT
-    nodes.exit().remove()
-    links.exit().remove()   
+   
 }
 
+function add_node(treeNode) {
+    var empty = { "id" : "new",
+		  "text" : "",
+		  "title" : "New Node"}
+    empty = d3.hierarchy(empty);
+    empty.vx = 0;
+    empty.vy = 0;
+    empty.x = 200;
+    empty.y = 200;
+    index = 0;
+    treeNode.descendants().forEach(function(node) {
+	if (node.index > index) {
+	    index = node.index;
+	}
+    })
+    empty.index = index + 1;
+    console.log(empty);
+    treeNode.children.push(empty);
+    update_data();
+}
 
 
 

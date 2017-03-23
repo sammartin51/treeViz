@@ -139,50 +139,52 @@ def register():
     else:
         return render_template("register.html")
 
-def process_data(content):
-    nodes = content["nodes"]
-    links = content["links"]
-    # update node content:
-    for node in nodes:
-        # check if it's in the database
-        db_node = db_session.query(Card).filter_by(id=node["id"]).first()
-        if db_node:
-            # update the date
-            db_node.title = node["title"]
-            db_node.content = node["text"]
-            db_session.commit()
-        else:
-            print('somethings wrong')          
+def process_data(node):
+    existing_card = db_session.query(Card).filter_by(id=node["id"]).first()
+    if existing_card != None:
+        existing_card.title = node["title"]
+        existing_card.content = node["text"]
+        if "children" in node:
+            for child in node["children"]:
+                process_data(child)
+    else:
+        new_card = Card(node["title"])
+        new_card.content = node["text"]
+        new_card.parent_ide = parent["id"]
+        if "children" in node:
+            new_card.children = [process_data(child)
+                                 for child
+                                 in new_card.children]
+        db_session.add(new_card)
+    db_session.commit()
+    
              
 @app.route("/_update_data", methods=["GET", "POST"])
 def update_data():
     if request.method == "GET":
         martisa4 = db_session.query(User).filter_by(name='martisa4').first()
         cards = martisa4.cards
-        nodes = [{"id" : card.id,
-                  "title" : card.title,
-                  "text" : card.content,
-                  "children" : [child_id for child_id in card.children]}
-                 for card in martisa4.cards]
+                
+        def generate_data(node):
+            if node.children:
+                return {"id" : node.id,
+                        "title" : node.title,
+                        "text" : node.content,
+                        "children" : [generate_data(child)
+                                      for child in node.children.values()]}
+            else:
+                return {"id" : node.id,
+                        "title" : node.title,
+                        "text" : node.content}
 
-        root_card = [card for card in martisa4.cards
-                     if card.parent == None][0]
-        def get_links(card):
-            if card.children:
-                for child_num in card.children:
-                    child = db_session.query(Card).filter_by(id=child_num).first()
-                    yield {"source" : card.id, "target" : child.id}
-                    yield from get_links(child)
-                    
-        links = [link for link in get_links(root_card)]
-        data = {
-            "nodes" : nodes,
-            "links" : links
-        }
-        return json.dumps(data) 
+        root = [card for card in cards
+                if card.parent_ide == None][0]
+
+        return json.dumps(generate_data(root))
+    
     if request.method == "POST":
         content = request.get_json(force=True)
-        process_data(content)
+        print(process_data(content))
         return 'ok'
 
         
