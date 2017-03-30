@@ -11,12 +11,12 @@
 /* The Overlay (background) */
 .overlay {
     /* Height & width depends on how you want to reveal the overlay (see JS below) */    
-    height: 100%;
-    width: 0%;
-    position: fixed; /* Stay in place */
+    height: 40%;
+    width: 100%;
+    position: relative; /* Stay in place */
     z-index: 1; /* Sit on top */
-    left: 10;
-    top: 0;
+    left: 0;
+    bottom: 0;
     background-color: rgb(0,0,0); /* Black fallback color */
     background-color: rgba(0,0,0, 0.9); /* Black w/opacity */
     overflow-x: hidden; /* Disable horizontal scroll */
@@ -28,8 +28,8 @@
     position: relative;
     top: 10%; /* 25% from the top */
     width: 100%; /* 100% width */
-    text-align: center; /* Centered text/links */
-    margin-top: 30px; /* 30px top margin to avoid conflict with the close button on smaller screens */
+    text-align: left; /* Centered text/links */
+    margin-top: 10px; /* 30px top margin to avoid conflict with the close button on smaller screens */
 }
 
 /* The navigation links inside the overlay */
@@ -46,22 +46,6 @@
 .overlay a:hover, .overlay a:focus {
     color: #f1f1f1;
 }
-
-/* Position the close button (top right corner) */
-
-.overlay .savebtn {
-    position: absolute;
-    top: 60px;
-    right: 45px;
-    font-size: 40px;
-}
-
-
-.overlay .quitbtn {
-    position: absolute;
-    top: 10px;
-    right: 45px;
-    font-size: 40px;
 }
 
 /* When the height of the screen is less than 450 pixels, change the font-size of the links and position the close button again, so they don't overlap */

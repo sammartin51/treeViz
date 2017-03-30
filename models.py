@@ -59,6 +59,7 @@ class Card(Base):
 
     children = relationship("Card",
 
+
                             # cascade deletions
                             cascade="all, delete-orphan",
 
@@ -76,5 +77,11 @@ class Card(Base):
     def __init__(self, title, parent=None):
         self.title = title
         self.parent = parent
+
+    def __repr__(self):
+        return 'Card<id: {}, title: {}, content: {}, user_id: {}'.format(self.id,
+                                    self.title,
+                                    self.content,
+                                    self.user_id)
         
 Base.metadata.create_all(engine)

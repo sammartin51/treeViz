@@ -22,7 +22,7 @@
 	<div class="col-xs-8">
 	  <form action="" id="usrform">
 	    <label for="comment">Comment:</label>
-	    <textarea class="form-control" rows="15" id="text" width="80"></textarea>
+	    <textarea class="form-control" rows="15" id="text"></textarea>
 	  </form>
 	</div>
       </div>
