@@ -193,9 +193,7 @@ def process_data(content):
                if card.id not in client_data]
 
     # process differences
-    print("added:")
     for node in added:
-        print(node["title"])
         new_card = Card(node["title"])
         new_card.content = node["text"]
 
@@ -210,7 +208,6 @@ def process_data(content):
 
     print("removed:")
     for card in removed:
-        print(card.title)
         db_session.delete(card)
         db_session.commit()
 
