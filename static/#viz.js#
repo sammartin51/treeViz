@@ -14,7 +14,6 @@ class AppContext {
 
     // OVERLAY FUNCTIONS
     overlay(c) {
-	console.log(this.viz);
 	let viz = this.viz;
 	let context = this;
 	$( '.overlay' )
@@ -111,8 +110,6 @@ class AppContext {
 	       },
 	       "json");
     }
-
-    
 }
 
 class TreeViz {
